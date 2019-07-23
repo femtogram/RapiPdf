@@ -45,6 +45,7 @@ export function getTypeInfo(schema, overrideAttributes=null){
     });
     returnObj.type='enum';
     returnObj.allowedValues = opt.slice(0,-2);
+    console.log(schema.enum);
   }
   else if (schema.type) {
     returnObj.type = schema.type;
@@ -208,7 +209,7 @@ export function schemaToPdf (schema, obj=[], name) {
               table: {
                 dontBreakRows: true,
                 body: rows
-              }
+              },
             },
             {text:`}`, style:['small', 'mono', 'blue']}
           ]
@@ -283,6 +284,61 @@ export function schemaToPdf (schema, obj=[], name) {
       ];
     }
 
+  }
+
+  else if (schema.enum) {
+    console.log("schema.enum");
+    console.log(schema);
+    let opt="[";
+    schema.enum.map(function(v){
+      opt = opt + `'${v}', `
+    });
+    opt = opt.slice(0, -2) + "]"
+    obj = [
+      {
+        colSpan: 3,
+        margin: [-4, 0, 0, 0],
+        stack:[
+          {
+            margin: 0,
+            widths: [ 'auto', 'auto', '*' ],
+            layout: rowLinesOnlyTableLayout,
+            defaultBorder: false,
+            table: {
+              dontBreakRows: true,
+              body: [
+                [
+                  {
+                    text:name, style:['small','mono']
+                  },
+                  {
+                    text:'enum', style:['small','mono']
+                  },
+                  {
+                  }
+                ],
+                [
+                  {
+                    text: ''
+                  },
+                  {
+                    text: 'allowed:', style:['small','mono', 'boldTd'],
+                  },
+                  {
+                    text:opt, style:['small', 'mono'], 
+                  },
+                ]
+              ]
+            },
+          },
+        ],
+      }
+    ];
+    // obj = [
+    //   {text:name + " enum", style:['small', 'mono', 'red'], margin:0},
+    //   {text:(schema.type ? schema.type:''), style:['small', 'mono', 'orange'], margin:0},
+    //   {text:(schema.description?schema.description:'foobar'), style:['small','purple'], margin:[0,2,0,0]}
+    // ];
   }
   
   else {
